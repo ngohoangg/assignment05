@@ -43,7 +43,7 @@ flowchart LR
     SR[RegisterSerializer / LoginSerializer / Update*Serializer]
     M[Customer + FullName + Address models]
     DB[(customer_db)]
-    CAS[Cart Service<br/>/api/carts/{customer_id}/]
+    CAS[Cart Service<br/>/api/carts/:customer_id/]
 
     API --> V --> SR --> M --> DB
     V --> CAS
@@ -98,7 +98,7 @@ flowchart LR
     S[Add/Update/Cart serializers]
     M[Cart + CartItem models]
     DB[(cart_db)]
-    BS[Book Service<br/>/api/books/{book_id}/]
+    BS[Book Service<br/>/api/books/:book_id/]
 
     API --> V --> S --> M --> DB
     V --> BS
@@ -165,4 +165,3 @@ flowchart LR
     CART --> BOOK
     CAT --> BOOK
 ```
-
