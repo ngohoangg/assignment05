@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}Danh muc sach - BookStore{% endblock %}
+
+{% block extra_css %}
+<style>
+    .catalog-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .catalog-note {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        color: var(--ink-muted);
+        background: #fff;
+    }
+
+    .catalog-filters {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        padding: 12px;
+        margin-bottom: 14px;
+        display: flex;
+        gap: 10px;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+
+    .catalog-filters .field {
+        display: grid;
+        gap: 6px;
+        min-width: 180px;
+    }
+
+    .catalog-filters label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ink-muted);
+    }
+
+    .catalog-filters select {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 9px;
+        font: inherit;
+        background: #fff;
+    }
+
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px;
+    }
+
+    .book-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: 120px auto;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .book-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-card);
+    }
+
+    .cover {
+        padding: 14px;
+        background:
+            linear-gradient(155deg, #fef3e8 0%, #e8f4ef 100%);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: end;
+    }
+
+    .cover-tag {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--brand-deep);
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid #cfe4d8;
+        padding: 5px 9px;
+        border-radius: 999px;
+    }
+
+    .content {
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+    }
+
+    .title {
+        font-size: 19px;
+        line-height: 1.25;
+        font-weight: 800;
+    }
+
+    .title a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .title a:hover {
+        color: var(--brand-deep);
+    }
+
+    .author {
+        color: var(--ink-muted);
+        font-size: 14px;
+    }
+
+    .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 10px;
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+    }
+
+    .price {
+        font-family: 'Fraunces', serif;
+        font-size: 30px;
+        line-height: 1;
+        color: var(--brand-deep);
+    }
+
+    .stock {
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 5px 9px;
+    }
+
+    .stock.ok {
+        background: #ecfdf3;
+        color: #166534;
+    }
+
+    .stock.low {
+        background: #fffbeb;
+        color: #92400e;
+    }
+
+    .stock.out {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    .actions {
+        display: grid;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="catalog-head">
+    <div class="section-head" style="margin-bottom: 0;">
+        <span class="kicker">Danh muc</span>
+        <h2>Chon tua sach phu hop hom nay</h2>
+        <p>Bo suu tap duoc trinh bay theo the moi de de quet nhanh va dat hang ngay.</p>
+    </div>
+    <div class="catalog-note">Them vao gio chi voi 1 click</div>
+</div>
+
+<form method="get" class="catalog-filters">
+    <div class="field">
+        <label for="category_id">Category</label>
+        <select id="category_id" name="category_id">
+            <option value="">Tat ca</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if selected_category_id == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="sort">Sap xep</label>
+        <select id="sort" name="sort">
+            <option value="" {% if not selected_sort %}selected{% endif %}>Mac dinh</option>
+            <option value="title" {% if selected_sort == 'title' %}selected{% endif %}>Tieu de (A-Z)</option>
+            <option value="-title" {% if selected_sort == '-title' %}selected{% endif %}>Tieu de (Z-A)</option>
+            <option value="price" {% if selected_sort == 'price' %}selected{% endif %}>Gia tang dan</option>
+            <option value="-price" {% if selected_sort == '-price' %}selected{% endif %}>Gia giam dan</option>
+            <option value="stock" {% if selected_sort == 'stock' %}selected{% endif %}>Ton kho tang dan</option>
+            <option value="-stock" {% if selected_sort == '-stock' %}selected{% endif %}>Ton kho giam dan</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn">Ap dung</button>
+    <a href="{% url 'books' %}" class="btn btn-soft">Xoa loc</a>
+</form>
+
+{% if books %}
+    <section class="books-grid">
+        {% for book in books %}
+            <article class="book-card">
+                <div class="cover">
+                    <span class="cover-tag">Book ID #{{ book.id }}</span>
+                </div>
+                <div class="content">
+                    <h3 class="title"><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></h3>
+                    <p class="author">{{ book.author }}</p>
+                    {% if book.category %}
+                        <p class="author">Category: <strong>{{ book.category.name }}</strong></p>
+                    {% else %}
+                        <p class="author">Category: Chua phan loai</p>
+                    {% endif %}
+
+                    <div class="meta">
+                        <div class="price">${{ book.price }}</div>
+                        <div class="stock {% if book.stock == 0 %}out{% elif book.stock < 5 %}low{% else %}ok{% endif %}">
+                            {% if book.stock == 0 %}
+                                Het hang
+                            {% elif book.stock < 5 %}
+                                Con {{ book.stock }}
+                            {% else %}
+                                Con hang
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if book.stock > 0 %}
+                        <div class="actions">
+                            <a href="{% url 'book_detail' book.id %}" class="btn btn-soft">Xem chi tiet</a>
+                            <form method="post" action="{% url 'add_to_cart' book.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="redirect_to" value="books">
+                                <button type="submit" class="btn" style="width: 100%;">Them vao gio</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <button class="btn btn-soft" style="width: 100%;" disabled>Da het hang</button>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </section>
+{% else %}
+    <div class="empty">Chua co sach nao trong he thong.</div>
+{% endif %}
+{% endblock %}

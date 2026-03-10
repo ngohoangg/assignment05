@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Dang ky - BookStore{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-layout {
+        max-width: 980px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+    }
+
+    .auth-side {
+        padding: 24px;
+        background: linear-gradient(155deg, #fff8ef 0%, #eaf5f0 100%);
+        border-right: 1px solid var(--line);
+    }
+
+    .auth-side h2 {
+        font-family: 'Fraunces', serif;
+        font-size: 38px;
+        line-height: 1.04;
+        margin-bottom: 10px;
+    }
+
+    .auth-side p {
+        color: var(--ink-muted);
+    }
+
+    .auth-side ul {
+        margin-top: 16px;
+        padding-left: 18px;
+        color: var(--ink-muted);
+        display: grid;
+        gap: 7px;
+    }
+
+    .auth-form {
+        padding: 24px;
+    }
+
+    .auth-form h3 {
+        font-size: 24px;
+        margin-bottom: 6px;
+    }
+
+    .auth-form p {
+        color: var(--ink-muted);
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+
+    .field {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .field label {
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .field input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 11px;
+        font: inherit;
+    }
+
+    .field input:focus {
+        outline: 2px solid #fed7aa;
+        border-color: var(--accent);
+    }
+
+    .foot {
+        margin-top: 13px;
+        color: var(--ink-muted);
+        font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+        .auth-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-side {
+            border-right: 0;
+            border-bottom: 1px solid var(--line);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="auth-layout">
+    <aside class="auth-side">
+        <h2>Tao tai khoan de bat dau mua sach</h2>
+        <p>Dang ky nhanh de truy cap day du luong mua hang tren he thong.</p>
+        <ul>
+            <li>Them sach vao gio hang moi luc</li>
+            <li>Quan ly don hang sau khi checkout</li>
+            <li>Nhan thong bao thay doi trang thai don</li>
+        </ul>
+    </aside>
+
+    <div class="auth-form">
+        <h3>Dang ky tai khoan</h3>
+        <p>Nhap thong tin co ban cua ban. Ban co the cap nhat dia chi sau khi dang nhap.</p>
+
+        <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <div class="field">
+                <label for="name">Ho va ten</label>
+                <input type="text" id="name" name="name" placeholder="Nguyen Van A" required>
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="example@email.com" required>
+            </div>
+            <div class="field">
+                <label for="password">Mat khau</label>
+                <input type="password" id="password" name="password" placeholder="Toi thieu 6 ky tu" required>
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">Dang ky</button>
+        </form>
+
+        <div class="foot">
+            Da co tai khoan? <a href="{% url 'login' %}">Dang nhap</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

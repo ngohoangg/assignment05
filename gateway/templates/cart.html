@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Gio hang - BookStore{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cart-layout {
+        display: grid;
+        grid-template-columns: 1.4fr 0.8fr;
+        gap: 16px;
+    }
+
+    .cart-list {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .cart-row {
+        padding: 15px;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .cart-row:last-child {
+        border-bottom: 0;
+    }
+
+    .name {
+        font-size: 19px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .meta {
+        color: var(--ink-muted);
+        font-size: 14px;
+    }
+
+    .right {
+        text-align: right;
+        display: grid;
+        justify-items: end;
+        gap: 7px;
+    }
+
+    .subtotal {
+        font-family: 'Fraunces', serif;
+        font-size: 28px;
+        color: var(--brand-deep);
+        line-height: 1;
+    }
+
+    .summary {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        padding: 16px;
+        align-self: start;
+        position: sticky;
+        top: 14px;
+    }
+
+    .summary h3 {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        color: var(--ink-muted);
+    }
+
+    .line-total {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px dashed var(--line);
+        padding-top: 12px;
+        margin-top: 10px;
+        font-family: 'Fraunces', serif;
+        font-size: 34px;
+        color: var(--brand-deep);
+        line-height: 1;
+    }
+
+    .summary-actions {
+        margin-top: 14px;
+        display: grid;
+        gap: 8px;
+    }
+
+    .shipping-form {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+    }
+
+    .shipping-form input {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 10px;
+        font: inherit;
+    }
+
+    @media (max-width: 980px) {
+        .cart-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .summary {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-head">
+    <span class="kicker">Gio hang</span>
+    <h2>Kiem tra don truoc khi dat</h2>
+    <p>Xem lai tung sach, so luong va tong gia tri thanh toan.</p>
+</div>
+
+{% if cart_items %}
+    <section class="cart-layout">
+        <div class="cart-list">
+            {% for item in cart_items %}
+                <article class="cart-row">
+                    <div>
+                        <div class="name">{{ item.book.title }}</div>
+                        <div class="meta">{{ item.book.author }} | So luong: {{ item.quantity }} | Don gia: ${{ item.book.price }}</div>
+                    </div>
+                    <div class="right">
+                        <div class="subtotal">${{ item.total }}</div>
+                        <form method="post" action="{% url 'remove_from_cart' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Xoa</button>
+                        </form>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <aside class="summary">
+            <h3>Hoa don tam tinh</h3>
+            <div class="line"><span>Trang thai</span><span>San sang dat</span></div>
+            <div class="line"><span>So dong san pham</span><span>{{ cart_items|length }}</span></div>
+            <div class="line-total"><span>Tong</span><span>${{ total_price }}</span></div>
+            <div class="summary-actions">
+                <a href="{% url 'books' %}" class="btn btn-soft">Tiep tuc mua</a>
+                <form method="post" action="{% url 'checkout' %}">
+                    {% csrf_token %}
+                    <div class="shipping-form">
+                        <input type="text" name="line1" placeholder="Dia chi line 1" value="{{ customer_address.line1 }}" required>
+                        <input type="text" name="line2" placeholder="Dia chi line 2" value="{{ customer_address.line2 }}">
+                        <input type="text" name="city" placeholder="Thanh pho" value="{{ customer_address.city }}" required>
+                        <input type="text" name="state" placeholder="Tinh/Bang" value="{{ customer_address.state }}">
+                        <input type="text" name="postal_code" placeholder="Ma buu chinh" value="{{ customer_address.postal_code }}">
+                        <input type="text" name="country" placeholder="Quoc gia" value="{{ customer_address.country }}" required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">Dat hang</button>
+                </form>
+            </div>
+        </aside>
+    </section>
+{% else %}
+    <div class="empty">
+        Gio hang dang trong. <a href="{% url 'books' %}">Mo danh muc sach</a>
+    </div>
+{% endif %}
+{% endblock %}

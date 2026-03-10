@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Dang nhap - BookStore{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-layout {
+        max-width: 980px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+    }
+
+    .auth-side {
+        padding: 24px;
+        background: linear-gradient(160deg, #fef8ef 0%, #ebf6f1 100%);
+        border-right: 1px solid var(--line);
+    }
+
+    .auth-side h2 {
+        font-family: 'Fraunces', serif;
+        font-size: 40px;
+        line-height: 1.04;
+        margin-bottom: 10px;
+    }
+
+    .auth-side p {
+        color: var(--ink-muted);
+    }
+
+    .auth-side ul {
+        margin-top: 16px;
+        padding-left: 18px;
+        color: var(--ink-muted);
+        display: grid;
+        gap: 7px;
+    }
+
+    .auth-form {
+        padding: 24px;
+    }
+
+    .auth-form h3 {
+        font-size: 24px;
+        margin-bottom: 6px;
+    }
+
+    .auth-form p {
+        color: var(--ink-muted);
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+
+    .field {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .field label {
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .field input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 11px;
+        font: inherit;
+    }
+
+    .field input:focus {
+        outline: 2px solid #99f6e4;
+        border-color: var(--brand);
+    }
+
+    .foot {
+        margin-top: 13px;
+        color: var(--ink-muted);
+        font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+        .auth-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-side {
+            border-right: 0;
+            border-bottom: 1px solid var(--line);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="auth-layout">
+    <aside class="auth-side">
+        <h2>Tro lai khong gian mua sach</h2>
+        <p>Dang nhap de dong bo gio hang va lich su don giua cac phien su dung.</p>
+        <ul>
+            <li>Truy cap danh muc sach moi nhat</li>
+            <li>Theo doi trang thai don da dat</li>
+            <li>Thanh toan nhanh tu gio hang</li>
+        </ul>
+    </aside>
+
+    <div class="auth-form">
+        <h3>Dang nhap tai khoan</h3>
+        <p>Nhap email va mat khau cua ban.</p>
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="example@email.com" required>
+            </div>
+            <div class="field">
+                <label for="password">Mat khau</label>
+                <input type="password" id="password" name="password" placeholder="Nhap mat khau" required>
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">Dang nhap</button>
+        </form>
+
+        <div class="foot">
+            Chua co tai khoan? <a href="{% url 'register' %}">Dang ky ngay</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

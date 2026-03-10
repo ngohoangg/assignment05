@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Trang chu - BookStore{% endblock %}
+
+{% block extra_css %}
+<style>
+    .home-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .hero {
+        padding: 28px;
+        border-radius: 22px;
+        border: 1px solid var(--line);
+        background:
+            linear-gradient(145deg, #fffdf7 0%, #ecf7f3 58%, #f5efe2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::after {
+        content: '';
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border-radius: 999px;
+        right: -40px;
+        bottom: -60px;
+        background: linear-gradient(160deg, rgba(15, 118, 110, 0.2), rgba(194, 65, 12, 0.12));
+    }
+
+    .hero h2 {
+        font-family: 'Fraunces', serif;
+        font-size: 45px;
+        line-height: 1.04;
+        margin-bottom: 12px;
+        letter-spacing: -0.03em;
+        max-width: 620px;
+    }
+
+    .hero p {
+        color: var(--ink-muted);
+        margin-bottom: 18px;
+        max-width: 560px;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .stats {
+        display: grid;
+        gap: 12px;
+    }
+
+    .stat-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        padding: 16px;
+    }
+
+    .stat-card strong {
+        font-size: 30px;
+        font-family: 'Fraunces', serif;
+        line-height: 1;
+    }
+
+    .stat-card p {
+        margin-top: 6px;
+        color: var(--ink-muted);
+        font-size: 14px;
+    }
+
+    .flow {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .flow-item {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        padding: 14px;
+    }
+
+    .flow-item span {
+        display: inline-block;
+        width: 26px;
+        height: 26px;
+        line-height: 26px;
+        text-align: center;
+        border-radius: 999px;
+        background: #e6f3ef;
+        color: var(--brand-deep);
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .flow-item h3 {
+        font-size: 17px;
+        margin-bottom: 6px;
+    }
+
+    .flow-item p {
+        color: var(--ink-muted);
+        font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+        .home-grid,
+        .flow {
+            grid-template-columns: 1fr;
+        }
+
+        .hero h2 {
+            font-size: 34px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="home-grid">
+    <article class="hero">
+        <h2>He thong ban sach thong nhat cho khach hang va staff</h2>
+        <p>Trai nghiem moi tap trung vao toc do mua sach, theo doi don va van hanh ton kho trong cung mot giao dien ngan gon.</p>
+
+        {% if request.session.staff_id %}
+            <div class="hero-actions">
+                <a href="{% url 'staff_dashboard' %}" class="btn">Mo khu vuc staff</a>
+                <a href="{% url 'logout' %}" class="btn btn-soft">Dang xuat</a>
+            </div>
+        {% elif request.session.user_id %}
+            <div class="hero-actions">
+                <a href="{% url 'books' %}" class="btn">Kham pha sach</a>
+                <a href="{% url 'cart' %}" class="btn btn-soft">Xem gio hang</a>
+                <a href="{% url 'orders' %}" class="btn btn-soft">Theo doi don</a>
+            </div>
+        {% else %}
+            <div class="hero-actions">
+                <a href="{% url 'login' %}" class="btn">Dang nhap khach hang</a>
+                <a href="{% url 'register' %}" class="btn btn-soft">Tao tai khoan</a>
+                <a href="{% url 'staff_login' %}" class="btn btn-soft">Dang nhap staff</a>
+            </div>
+        {% endif %}
+    </article>
+
+    <aside class="stats">
+        <article class="stat-card">
+            <strong>05</strong>
+            <p>Microservices hoat dong song song</p>
+        </article>
+        <article class="stat-card">
+            <strong>REST</strong>
+            <p>Dong bo du lieu sach, gio, don va users</p>
+        </article>
+        <article class="stat-card">
+            <strong>1 Gateway</strong>
+            <p>Diem truy cap chung cho customer va staff</p>
+        </article>
+    </aside>
+</section>
+
+<section class="flow">
+    <article class="flow-item">
+        <span>1</span>
+        <h3>Chon sach</h3>
+        <p>Duyet danh muc va xem chi tiet theo tung tua sach.</p>
+    </article>
+    <article class="flow-item">
+        <span>2</span>
+        <h3>Dat hang</h3>
+        <p>Them vao gio, kiem tra tong tien va checkout nhanh.</p>
+    </article>
+    <article class="flow-item">
+        <span>3</span>
+        <h3>Theo doi</h3>
+        <p>Xem lich su don va cap nhat trang thai tu dashboard staff.</p>
+    </article>
+</section>
+{% endblock %}

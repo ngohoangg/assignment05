@@ -1,0 +1,174 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: micro-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p123456"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  customer-service:
+    build:
+      context: .
+    container_name: micro-customer-service
+    working_dir: /app/customer-service
+    command: ["/bin/sh", "/app/scripts/start_django.sh"]
+    restart: unless-stopped
+    environment:
+      PORT: "8002"
+      DB_NAME: customer_db
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      ALLOWED_HOSTS: "*"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8002:8002"
+
+  book-service:
+    build:
+      context: .
+    container_name: micro-book-service
+    working_dir: /app/book-service
+    command: ["/bin/sh", "/app/scripts/start_django.sh"]
+    restart: unless-stopped
+    environment:
+      PORT: "8003"
+      DB_NAME: book_db
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      ALLOWED_HOSTS: "*"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8003:8003"
+
+  catalog-service:
+    build:
+      context: .
+    container_name: micro-catalog-service
+    working_dir: /app/catalog-service
+    command: ["/bin/sh", "/app/scripts/start_django.sh"]
+    restart: unless-stopped
+    environment:
+      PORT: "8008"
+      DB_NAME: catalog_db
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      ALLOWED_HOSTS: "*"
+      BOOK_SERVICE_URL: http://book-service:8003/api/books
+    depends_on:
+      mysql:
+        condition: service_healthy
+      book-service:
+        condition: service_started
+    ports:
+      - "8008:8008"
+
+  cart-service:
+    build:
+      context: .
+    container_name: micro-cart-service
+    working_dir: /app/cart-service
+    command: ["/bin/sh", "/app/scripts/start_django.sh"]
+    restart: unless-stopped
+    environment:
+      PORT: "8004"
+      DB_NAME: cart_db
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      ALLOWED_HOSTS: "*"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8004:8004"
+
+  gateway:
+    build:
+      context: .
+    container_name: micro-gateway
+    working_dir: /app/gateway
+    command: ["/bin/sh", "-c", "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8005"]
+    restart: unless-stopped
+    environment:
+      ALLOWED_HOSTS: "*"
+      CUSTOMER_SERVICE_URL: http://customer-service:8002/api/customers
+      BOOK_SERVICE_URL: http://book-service:8003/api/books
+      CART_SERVICE_URL: http://cart-service:8004/api/carts
+      ORDER_SERVICE_URL: http://order-service:8006/api/orders
+      STAFF_SERVICE_URL: http://staff-service:8007/api/staff
+      CATALOG_SERVICE_URL: http://catalog-service:8008/api/catalog
+    depends_on:
+      - customer-service
+      - book-service
+      - catalog-service
+      - cart-service
+      - order-service
+      - staff-service
+    ports:
+      - "8005:8005"
+
+  order-service:
+    build:
+      context: .
+    container_name: micro-order-service
+    working_dir: /app/order-service
+    command: ["/bin/sh", "/app/scripts/start_django.sh"]
+    restart: unless-stopped
+    environment:
+      PORT: "8006"
+      DB_NAME: order_db
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      ALLOWED_HOSTS: "*"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8006:8006"
+
+  staff-service:
+    build:
+      context: .
+    container_name: micro-staff-service
+    working_dir: /app/staff-service
+    command: ["/bin/sh", "/app/scripts/start_django.sh"]
+    restart: unless-stopped
+    environment:
+      PORT: "8007"
+      DB_NAME: staff_db
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      ALLOWED_HOSTS: "*"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8007:8007"
+
+volumes:
+  mysql_data:
